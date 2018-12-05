@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <time.h>
+#include <string.h>
 
 struct SERVER_DATA
 {
@@ -29,12 +30,11 @@ int main(int argc,
     uv_poll_t poll_handle;
     uv_signal_t sigint_handle, sigterm_handle;
     struct SERVER_DATA cd = {NULL, &poll_handle};
+    unsigned short port = 8888;
 
-    if (argc != 2)
+    if (argc == 2)
     {
-        printf("%s PORT\n",
-               argv[0]);
-        return 1;
+        port = atoi(argv[1]);
     }
 
     uv_signal_init(uv_default_loop(), &sigint_handle);
@@ -44,7 +44,7 @@ int main(int argc,
     uv_signal_start(&sigterm_handle, shutdown_handler, SIGTERM);
 
     d = MHD_start_daemon(MHD_USE_EPOLL_LINUX_ONLY | MHD_USE_DEBUG,
-                         atoi(argv[1]),
+                         port,
                          NULL,
                          NULL,
                          access_handler_cb,
